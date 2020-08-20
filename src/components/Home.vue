@@ -2,7 +2,7 @@
   <div class = "home">
     <header class = "header row">
       <div class="col-auto about-link-div">
-        <a href = "/about">{{ $t('about') }}</a>
+        <router-link to = "/about">{{ $t('about') }}</router-link>
       </div>
       <div class="col"></div>
       <div class = "col-auto language-switch-div">
@@ -322,7 +322,7 @@ li {
   margin: 0 10px;
 }
 a {
-  color: lightyellow;
+  color: #ffff80;
 }
 .title {
   font-size: 96px;
