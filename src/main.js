@@ -17,8 +17,38 @@ Vue.config.productionTip = false
 Vue.prototype.axios = axios;
 
 const routes = [
-  { path: '/', component: Home },
-  { path: '/about', component: About }
+  { path: '/', 
+    component: Home,
+    meta: {
+      title: 'Dáme Guláš',
+      metaTags: [
+        {
+          name: 'description',
+          content: 'Dáme Guláš - Find the guláš offering nearest to you with the click of a button.'
+        },
+        {
+          property: 'og:description',
+          content: 'Dáme Guláš - Find the guláš offering nearest to you with the click of a button.'
+        }
+      ],
+    },
+  },
+  { path: '/about',
+    component: About,
+    meta: {
+      title: 'About - Dáme Guláš',
+      metaTags: [
+        {
+          name: 'description',
+          content: 'Dáme Guláš - Find the guláš offering nearest to you with the click of a button.'
+        },
+        {
+          property: 'og:description',
+          content: 'Dáme Guláš - Find the guláš offering nearest to you with the click of a button.'
+        }
+      ],
+    },
+  },
 ]
 
 const router = new VueRouter({

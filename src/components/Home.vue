@@ -95,31 +95,21 @@ export default {
       errorMessage: '',
       loading: false,
       menuUrl: '',
+      lat: null,
+      long: null,
     };
   },
-  created() {
-    //this.debouncedCheckDailyMenu = throttle(this.checkDailyMenu, 10, {leading: true});
-  },
   methods: {
-    switchLanguage() {
-      console.log('switch language function');
-    },
-
     getLocation() {
-      this.loading = true;
-
-      document.getElementById('findButton').className ='slide-out-bottom';
-
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(this.zomatoCall);
-
+        navigator.geolocation.getCurrentPosition(this.searchRestaurants);
       } else {
         this.errorMessage = "Geolocation is not supported by this browser.";
         this.showResults = true;
       }
     },
 
-    async zomatoCall(position) {
+    async searchRestaurants(position) {
       // const ZOMATO_GET_RESTAURANTS = "https://developers.zomato.com/api/v2.1/geocode";
       const M_RADIUS = 5000;
       const SLOVAK_CUISINE_ID = 701;
@@ -135,26 +125,20 @@ export default {
       const CATEGORIES_ID_STRING = '9';
       const ESTABLISHMENT_ID_STRING = '16,6,211,161,181';
 
-      for(searchOffset=0; searchOffset<MAX_SEARCH_RESULTS; searchOffset += PAGE_LENGTH) {
-        let searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
-        /*this.axios.get(searchRequestUrl)
-        .then(response => {
-          this.results = response.data;
-          for(var i=0;i<PAGE_LENGTH;i++) {
-            foundGulas = this.checkDailyMenu(this.results.restaurants[i]);
-            if(foundGulas) {
-              this.gulasRestaurant = this.results.restaurants[i];
-              break;
-            }
-          }*/
-          
-      
+      this.lat = position.coords.latitude;
+      this.long = position.coords.longitude;
 
-        // console.log(`offset: ${searchOffset}`);
-        // const response = await this.axios.get(searchRequestUrl);
+      this.loading = true;
+      document.getElementById('findButton').className ='slide-out-bottom';
+
+      await this.getLocation();
+
+      for(searchOffset=0; searchOffset<MAX_SEARCH_RESULTS; searchOffset += PAGE_LENGTH) {
+        let searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${this.lat}&lon=${this.long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
+
         this.results = await this.makeZomatoApiCall(searchRequestUrl);
         if(this.results<100){
-          searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${position.coords.latitude}&lon=${position.coords.longitude}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&sort=real_distance`;
+          searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${this.lat}&lon=${this.long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&sort=real_distance`;
         }
         console.log(this.results);
         for(var i=0;i<PAGE_LENGTH;i++) {
@@ -176,7 +160,7 @@ export default {
 
       if(foundGulas) {
           console.log("found gulas!!");
-          this.restaurantDistance = this.latLongDistance(position.coords.latitude,position.coords.longitude,this.gulasRestaurant.location.latitude, this.gulasRestaurant.location.longitude);
+          this.restaurantDistance = this.latLongDistance(this.lat,this.long,this.gulasRestaurant.location.latitude, this.gulasRestaurant.location.longitude);
           this.googleMapsLink = "http://maps.google.com/maps?q=" + encodeURIComponent( this.gulasRestaurant.location.address ) + "' target='_blank";
           this.foundGulas = true;
           this.showResults = true;
@@ -368,12 +352,22 @@ a {
   align-items: center;
   justify-content: center;
 
-    animation-name: loadingFadeIn;
-    animation-duration: 0.5s;
-    animation-timing-function: ease-in;
-    animation-fill-mode: forwards;
-    animation-iteration-count: 1;
+  animation-name: loadingFadeIn;
+  animation-duration: 0.5s;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
 }
+
+@keyframes loadingFadeIn{
+    0%{
+      opacity: 0;
+    }
+    100%{
+      opacity: 1;
+    }
+}
+
 .loader {
   border: 6px solid #e6e6e6;
   border-top: 6px solid #262673;
@@ -395,11 +389,11 @@ a {
 }
 
 .slide-out-bottom{
-    animation-name: slideOutBottom;
-    animation-duration:0.5s;
-    animation-timing-function: ease;
-    animation-fill-mode: forwards;
-    animation-iteration-count: 1;
+  animation-name: slideOutBottom;
+  animation-duration:0.5s;
+  animation-timing-function: ease;
+  animation-fill-mode: forwards;
+  animation-iteration-count: 1;
 }
 
 @keyframes slideOutBottom{
@@ -412,14 +406,7 @@ a {
         transform: translateY(500%);
     }
 }
-@keyframes loadingFadeIn{
-    0%{
-      opacity: 0%;
-    }
-    100%{
-      opacity: 100%;
-    }
-}
+
 @media only screen and (max-width: 768px) {
   .title {
     font-size: 60px;
