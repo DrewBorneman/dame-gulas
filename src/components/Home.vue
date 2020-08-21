@@ -62,7 +62,8 @@
             <h4>{{ gulasRestaurant.location.address }}</h4>
             <div>{{ $t('distance') }}</div>
             <h4>{{ restaurantDistance }} m</h4>
-            <a :href = "googleMapsLink">Show Directions</a>
+            <a :href = "menuUrl">{{ $t('checkMenu') }}</a>
+            <a :href = "googleMapsLink">{{ $t('showDirections') }}</a>
           </div>
           <div v-else>
             <h3 class = "found-restaurant">
@@ -93,6 +94,7 @@ export default {
       showResults: false,
       errorMessage: '',
       loading: false,
+      menuUrl: '',
     };
   },
   created() {
@@ -197,6 +199,7 @@ export default {
       if(dailyMenu){
         if(dailyMenu.daily_menus.length !== 0){
           console.log("checking for Gulas at :", res_id);
+          this.menuUrl = res.menu_url;
           dailyMenu.daily_menus[0].daily_menu.dishes.forEach(dish => {
             dishes.push(dish.dish.name);
           })
@@ -235,9 +238,8 @@ export default {
       let dishes = [];
       let searchResults = await this.makeGoogleApiCall(searchUrl, params);
       if(searchResults.items.length!==0){
-        const menuUrl = searchResults.items[0].link;
-        console.log(menuUrl);
-        const html = await this.makeSmeContentCall(menuUrl);
+        this.menuUrl = searchResults.items[0].link;
+        const html = await this.makeSmeContentCall(this.menuUrl);
         const $ = cheerio.load(html);
         if($('.emptyContentMessageContainer').length>0) {
           console.log('no daily menu in SME now');
@@ -314,6 +316,7 @@ export default {
 <style scoped>
 a {
   color: #ffff80;
+  text-decoration: none;
 }
 .title {
   font-size: 96px;

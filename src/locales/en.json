@@ -2,11 +2,14 @@
   "about":  "About",
   "atRestaurant": "at restaurant:",
   "checking": "Currently checking: ",
+  "checkMenu": "Check Menu",
   "distance": "Distance:",
   "find": "Find",
   "foundRestaurant": "Guláš Found!",
+  "home": "Home",
   "location": "Location:",
   "searching": "Searching Restaurants...",
+  "showDirections": "Show Directions",
   "subtitle": "Find the guláš offering nearest to you with the click of a button",
   "title": "Dáme Guláš"
 }

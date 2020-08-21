@@ -2,12 +2,14 @@
   "about":  "O stránke",
   "atRestaurant": "V Reštaurácii:",
   "checking": "Momentálne Kontroluje: ",
+  "checkMenu": "Zobraziť Menu",
   "distance": "Vzdialenosť:",
   "find": "Hľadať",
   "foundRestaurant": "Guláš Našiel!",
   "home": "Domov",
   "location": "Lokalita:",
   "searching": "Vyhľadávanie reštaurácií...",
+  "showDirections": "Zobraziť Trasu",
   "subtitle": "Nájdite guláš, ktorý vám je najbližší, kliknutím na tlačidlo",
   "title": "Dáme Guláš"
 }

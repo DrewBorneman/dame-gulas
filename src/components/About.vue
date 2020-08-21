@@ -45,6 +45,7 @@
 <style scoped>
 a {
   color: #ffff80;
+  text-decoration: none;
 }
 .text {
   margin-top: 25px;
