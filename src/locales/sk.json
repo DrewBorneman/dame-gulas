@@ -8,8 +8,10 @@
   "foundRestaurant": "Guláš Našiel!",
   "home": "Domov",
   "location": "Lokalita:",
+  "noGulas":  "Dnes nie guláš :(",
   "searching": "Vyhľadávanie reštaurácií...",
   "showDirections": "Zobraziť Trasu",
   "subtitle": "Nájdite guláš, ktorý vám je najbližší, kliknutím na tlačidlo",
-  "title": "Dáme Guláš"
+  "title": "Dáme Guláš",
+  "zomatoError": "Nezodpovedal od Zomato - denný limit hovorov API mohol byť prekročený"
 }

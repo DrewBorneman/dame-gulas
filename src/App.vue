@@ -8,6 +8,9 @@
 
 export default {
   name: 'App',
+  created () {
+    document.title = this.$route.meta.title;
+}
 }
 </script>
 

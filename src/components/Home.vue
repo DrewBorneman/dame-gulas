@@ -67,7 +67,7 @@
           </div>
           <div v-else>
             <h3 class = "found-restaurant">
-              No gulas today :(
+              {{ errorMessage }}
             </h3>
           </div>
         </div>
@@ -95,8 +95,6 @@ export default {
       errorMessage: '',
       loading: false,
       menuUrl: '',
-      lat: null,
-      long: null,
     };
   },
   methods: {
@@ -120,25 +118,32 @@ export default {
       const MAX_SEARCH_RESULTS = 100;
       let searchOffset = 0;
       let foundGulas = false;     
-      
+      let totalResults = MAX_SEARCH_RESULTS;
+      let searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
+
       const CUISINE_ID_STRING = `${SLOVAK_CUISINE_ID},${CZECH_CUISINE_ID},${HUNGARIAN_CUISINE_ID}`;
       const CATEGORIES_ID_STRING = '9';
       const ESTABLISHMENT_ID_STRING = '16,6,211,161,181';
 
-      this.lat = position.coords.latitude;
-      this.long = position.coords.longitude;
+      const lat = position.coords.latitude;
+      const long = position.coords.longitude;
 
       this.loading = true;
       document.getElementById('findButton').className ='slide-out-bottom';
 
       await this.getLocation();
 
-      for(searchOffset=0; searchOffset<MAX_SEARCH_RESULTS; searchOffset += PAGE_LENGTH) {
-        let searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${this.lat}&lon=${this.long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
-
+      for(searchOffset=0; searchOffset < totalResults; searchOffset += PAGE_LENGTH) {  
         this.results = await this.makeZomatoApiCall(searchRequestUrl);
-        if(this.results<100){
-          searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${this.lat}&lon=${this.long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&sort=real_distance`;
+        
+        if(typeof this.results === 'undefined') {
+          this.errorMessage = $t('zomatoError');
+          break;
+        }
+
+        if(this.results.results_found < MAX_SEARCH_RESULTS){
+          searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&sort=real_distance`;
+          totalResults = this.results.results_found;
         }
         console.log(this.results);
         for(var i=0;i<PAGE_LENGTH;i++) {
@@ -160,13 +165,13 @@ export default {
 
       if(foundGulas) {
           console.log("found gulas!!");
-          this.restaurantDistance = this.latLongDistance(this.lat,this.long,this.gulasRestaurant.location.latitude, this.gulasRestaurant.location.longitude);
+          this.restaurantDistance = this.latLongDistance(lat,long,this.gulasRestaurant.location.latitude, this.gulasRestaurant.location.longitude);
           this.googleMapsLink = "http://maps.google.com/maps?q=" + encodeURIComponent( this.gulasRestaurant.location.address ) + "' target='_blank";
           this.foundGulas = true;
           this.showResults = true;
         }
         else {
-          this.errorMessage = "No guláš today :(";
+          this.errorMessage = $t('noGulas');
           console.log(this.errorMessage);
           this.foundGulas = false;
           this.showResults = true;

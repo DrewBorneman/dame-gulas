@@ -8,8 +8,10 @@
   "foundRestaurant": "Guláš Found!",
   "home": "Home",
   "location": "Location:",
+  "noGulas":  "No guláš today :(",
   "searching": "Searching Restaurants...",
   "showDirections": "Show Directions",
   "subtitle": "Find the guláš offering nearest to you with the click of a button",
-  "title": "Dáme Guláš"
+  "title": "Dáme Guláš",
+  "zomatoError": "Didn't receive a response from Zomato - the daily limit of API calls may have been exceeded"
 }
