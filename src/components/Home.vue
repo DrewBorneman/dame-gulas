@@ -1,6 +1,6 @@
 <template>
   <div class = "home">
-    <header class = "header row">
+    <header class = "header">
       <div class="col-auto about-link-div">
         <router-link to = "/about">{{ $t('about') }}</router-link>
       </div>
@@ -22,50 +22,50 @@
           </a>
       </div>
     </header>
-    <content class="row">
+    <content>
       <div class="content col-auto">
-        <div class="main-row row">
+        <div class="main-row">
           <h1 class="title">{{ $t('title') }}</h1>
         </div>
-        <div class="main-row row">
+        <div class="main-row">
           <h6 class="subtitle">{{ $t('subtitle') }}</h6>
         </div>
         <div 
-          class="main-row row"
+          class="main-row"
           v-if="!showResults"
           >
-            <div v-if="!loading">
-              <button class = "button-start btn-primary" @click="getLocation()">{{ $t('find') }}</button>
+            <div class="find-button" id="findButton">
+              <button class="button-start btn-primary" @click="getLocation()">{{ $t('find') }}</button>
             </div>
             <div 
               class="loading"
-              v-else
+              v-if="loading"
             >
               <h3>{{ $t('searching') }}</h3>
               <div class="loader"></div>
               <p>{{ $t('checking') }}{{ currentRestaurant.name }}</p>
             </div>
         </div>
-        <div class="main-row row"
+        <div class="main-row"
           v-else
         >
           <div 
             class="results"
             v-if="errorMessage===''"
           >
-            <h3 class=" found-title row">{{ $t('foundRestaurant') }}</h3>
-            <div class="row">{{ $t('atRestaurant') }}</div>
-            <h3 class = "row found-restaurant">
+            <h3 class=" found-title">{{ $t('foundRestaurant') }}</h3>
+            <div>{{ $t('atRestaurant') }}</div>
+            <h3 class = "found-restaurant">
               {{ gulasRestaurant.name }}
             </h3>
-            <div class="row">{{ $t('location') }}</div>
+            <div>{{ $t('location') }}</div>
             <h4>{{ gulasRestaurant.location.address }}</h4>
-            <div class="row">{{ $t('distance') }}</div>
+            <div>{{ $t('distance') }}</div>
             <h4>{{ restaurantDistance }} m</h4>
             <a :href = "googleMapsLink">Show Directions</a>
           </div>
           <div v-else>
-            <h3 class = "row found-restaurant">
+            <h3 class = "found-restaurant">
               No gulas today :(
             </h3>
           </div>
@@ -104,7 +104,10 @@ export default {
     },
 
     getLocation() {
-      this.loading = false;
+      this.loading = true;
+
+      document.getElementById('findButton').className ='slide-out-bottom';
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(this.zomatoCall);
 
@@ -124,11 +127,7 @@ export default {
       const PAGE_LENGTH = 20;
       const MAX_SEARCH_RESULTS = 100;
       let searchOffset = 0;
-      let foundGulas = false;
-
-      this.loading = true;
-
-      
+      let foundGulas = false;     
       
       const CUISINE_ID_STRING = `${SLOVAK_CUISINE_ID},${CZECH_CUISINE_ID},${HUNGARIAN_CUISINE_ID}`;
       const CATEGORIES_ID_STRING = '9';
@@ -313,14 +312,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
 a {
   color: #ffff80;
 }
@@ -334,26 +325,21 @@ a {
   font-style: italic;
   margin-bottom: 50px;
 }
+.find-button {
+  min-width: 100%;
+  max-width: 300px;
+}
 .button-start {
   margin-top: 80px;
-  width: 300px;
+  padding-left: 100px;
+  padding-right: 100px;
+  max-width: 300px;
   height: 80px;
   color: #fff;
   background-color: rgba(2,2,71,0.22);
   border-color: rgba(255,255,255,0.6);
   border-radius: 5px;
   font-size: 36px;
-}
-.about-link-div {
-  margin-left: 10px;
-  float: left;
-}
-.language-switch-div {
-  margin-right: 10px;
-  float: right;
-}
-.header {
-  margin-top: 10px;
 }
 .main-row {
   width: 100%;
@@ -378,6 +364,12 @@ a {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+    animation-name: loadingFadeIn;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
 }
 .loader {
   border: 6px solid #e6e6e6;
@@ -389,9 +381,56 @@ a {
   margin-bottom: 25px;
   animation: spin 1s linear infinite;
 }
+.home {
+  min-height: 100vh;
+  overflow: hidden;
+}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.slide-out-bottom{
+    animation-name: slideOutBottom;
+    animation-duration:0.5s;
+    animation-timing-function: ease;
+    animation-fill-mode: forwards;
+    animation-iteration-count: 1;
+}
+
+@keyframes slideOutBottom{
+    0%{
+      position: absolute;
+        transform: translateY(0%);
+    }
+    100%{
+      position: absolute;
+        transform: translateY(500%);
+    }
+}
+@keyframes loadingFadeIn{
+    0%{
+      opacity: 0%;
+    }
+    100%{
+      opacity: 100%;
+    }
+}
+@media only screen and (max-width: 768px) {
+  .title {
+    font-size: 60px;
+    margin-top: 40px;
+  }
+  .main-row {
+    width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .button-start {
+    margin-top: 50px;
+    padding-left: 60px;
+    padding-right: 60px;
+  }
 }
 </style>
