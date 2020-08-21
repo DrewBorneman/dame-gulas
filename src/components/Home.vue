@@ -119,8 +119,7 @@ export default {
       let searchOffset = 0;
       let foundGulas = false;     
       let totalResults = MAX_SEARCH_RESULTS;
-      let searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
-
+      
       const CUISINE_ID_STRING = `${SLOVAK_CUISINE_ID},${CZECH_CUISINE_ID},${HUNGARIAN_CUISINE_ID}`;
       const CATEGORIES_ID_STRING = '9';
       const ESTABLISHMENT_ID_STRING = '16,6,211,161,181';
@@ -131,11 +130,10 @@ export default {
       this.loading = true;
       document.getElementById('findButton').className ='slide-out-bottom';
 
-      await this.getLocation();
+      let searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
 
       for(searchOffset=0; searchOffset < totalResults; searchOffset += PAGE_LENGTH) {  
         this.results = await this.makeZomatoApiCall(searchRequestUrl);
-        
         if(typeof this.results === 'undefined') {
           this.errorMessage = this.$t('zomatoError');
           break;
@@ -171,7 +169,9 @@ export default {
           this.showResults = true;
         }
         else {
-          this.errorMessage = this.$t('noGulas');
+          if(this.errorMessage === '') {
+            this.errorMessage = this.$t('noGulas');
+          }
           console.log(this.errorMessage);
           this.foundGulas = false;
           this.showResults = true;
