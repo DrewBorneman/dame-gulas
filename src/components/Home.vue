@@ -137,7 +137,7 @@ export default {
         this.results = await this.makeZomatoApiCall(searchRequestUrl);
         
         if(typeof this.results === 'undefined') {
-          this.errorMessage = $t('zomatoError');
+          this.errorMessage = this.$t('zomatoError');
           break;
         }
 
@@ -171,7 +171,7 @@ export default {
           this.showResults = true;
         }
         else {
-          this.errorMessage = $t('noGulas');
+          this.errorMessage = this.$t('noGulas');
           console.log(this.errorMessage);
           this.foundGulas = false;
           this.showResults = true;
