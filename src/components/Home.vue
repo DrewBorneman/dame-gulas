@@ -95,6 +95,7 @@ export default {
       errorMessage: '',
       loading: false,
       menuUrl: '',
+      detailedSearch: true,
     };
   },
   methods: {
@@ -119,6 +120,7 @@ export default {
       let searchOffset = 0;
       let foundGulas = false;     
       let totalResults = MAX_SEARCH_RESULTS;
+      let searchRequestUrl = '';
       
       const CUISINE_ID_STRING = `${SLOVAK_CUISINE_ID},${CZECH_CUISINE_ID},${HUNGARIAN_CUISINE_ID}`;
       const CATEGORIES_ID_STRING = '9';
@@ -130,9 +132,15 @@ export default {
       this.loading = true;
       document.getElementById('findButton').className ='slide-out-bottom';
 
-      let searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
-
+      
       for(searchOffset=0; searchOffset < totalResults; searchOffset += PAGE_LENGTH) {  
+
+        if(this.detailedSearch) {
+          searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&establishment_type=${ESTABLISHMENT_ID_STRING}&category=${CATEGORIES_ID_STRING}&sort=real_distance`;
+        } else {
+          searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&sort=real_distance`;
+        }
+
         this.results = await this.makeZomatoApiCall(searchRequestUrl);
         if(typeof this.results === 'undefined') {
           this.errorMessage = this.$t('zomatoError');
@@ -140,14 +148,14 @@ export default {
         }
 
         if(this.results.results_found < MAX_SEARCH_RESULTS){
-          searchRequestUrl = `https://developers.zomato.com/api/v2.1/search?start=${searchOffset}&count=${PAGE_LENGTH}&lat=${lat}&lon=${long}&radius=${M_RADIUS}&cuisines=${CUISINE_ID_STRING}&sort=real_distance`;
+          this.detailedSearch = false;
           totalResults = this.results.results_found;
         }
         console.log(this.results);
         for(var i=0;i<PAGE_LENGTH;i++) {
           this.currentRestaurant = this.results.restaurants[i].restaurant;
           if(this.currentRestaurant.highlights.includes("Lunch Menu")) { 
-            foundGulas = await this.checkDailyMenu(this.currentRestaurant);  //ADD DEBOUNCE
+            foundGulas = await this.checkDailyMenu(this.currentRestaurant); 
             if(foundGulas) {
               this.gulasRestaurant = this.currentRestaurant;
               console.log("found gulas at restaurant ", this.gulasRestaurant);
